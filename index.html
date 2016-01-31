@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <title></title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="reveal.js/css/reveal.min.css"/>
+    <style type="text/css">code{white-space: pre;}</style>
+    <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #303030; color: #cccccc; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; }
+td.sourceCode { padding-left: 5px; }
+pre, code { color: #cccccc; background-color: #303030; }
+code > span.kw { color: #f0dfaf; }
+code > span.dt { color: #dfdfbf; }
+code > span.dv { color: #dcdccc; }
+code > span.bn { color: #dca3a3; }
+code > span.fl { color: #c0bed1; }
+code > span.ch { color: #dca3a3; }
+code > span.st { color: #cc9393; }
+code > span.co { color: #7f9f7f; }
+code > span.ot { color: #efef8f; }
+code > span.al { color: #ffcfaf; }
+code > span.fu { color: #efef8f; }
+code > span.er { color: #c3bf9f; }
+    </style>
+    <link rel="stylesheet" href="reveal.js/css/theme/simple.css" id="theme">
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script>
+      if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = 'reveal.js/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+      }
+    </script>
+    <!--[if lt IE 9]>
+    <script src="reveal.js/lib/js/html5shiv.js"></script>
+    <![endif]-->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+
+<section><section id="字串處理" class="titleslide slide level1"><h1>字串處理</h1></section><section id="who-am-i" class="slide level2">
+<h1>Who am I ?</h1>
+<p>下降 資工所一年級</p>
+</section><section id="什麼是字串" class="slide level2">
+<h1>什麼是字串?</h1>
+<p>&quot;Hi你好&quot;</p>
+<p>&quot;ATCGATCGGGGGG&quot;</p>
+<p>&quot;asdff;lkjsadflkj&quot;</p>
+</section><section id="正式的定義" class="slide level2">
+<h1>正式的定義</h1>
+<p>給定字元集 <span class="math">\(\Sigma\)</span> ，長度為 <span class="math">\(n\)</span> 的字串 <span class="math">\(A\)</span>，</p>
+<p><span class="math">\(A = a_0 a_1 \dots a_{n-1}\)</span></p>
+</section><section id="一些名詞定義" class="slide level2">
+<h1>一些名詞定義</h1>
+<p>給訂一字串 <span class="math">\(A = a_0 a_1 \dots a_{n-1}\)</span></p>
+<ul>
+<li class="fragment"><p>子字串</p>
+<p><span class="math">\(A[i,j] = a_{i} a_{i+1} \dots a_{j}\)</span></p></li>
+<li class="fragment"><p>子序列</p>
+<p><span class="math">\(B = a_{q_1} a_{q_2} \dots a_{q_m}\)</span></p>
+<p><span class="math">\(0 \le q_1 &lt; q_2 &lt; \dots q_m &lt; n\)</span></p></li>
+</ul>
+</section><section id="一些名詞定義-1" class="slide level2">
+<h1>一些名詞定義</h1>
+<ul>
+<li class="fragment"><p>前綴 (Prefix)</p>
+<p><span class="math">\(P_A(i) = A[0,i]\)</span></p></li>
+<li class="fragment"><p>後綴 (Suffix)</p>
+<p><span class="math">\(S_A(i) = A[i,n-1]\)</span></p></li>
+</ul>
+</section><section id="例子" class="slide level2">
+<h1>例子</h1>
+<p>舉例來說，如果<span class="math">\(A = \texttt{abcbbab}\)</span>，那 <span class="math">\(\texttt{bcb}\)</span> 是他的子字串， <span class="math">\(\texttt{acb}\)</span> 是他的子序列，而 <span class="math">\(\texttt{bbab}\)</span> 是他的一個後綴。</p>
+</section><section id="字串的儲存" class="slide level2">
+<h1>字串的儲存</h1>
+</section><section id="trie" class="slide level2">
+<h1>Trie</h1>
+<p>通常最基本的儲存方式就是用一個陣列依序將字串的每一個字元存下來。</p>
+<p>不過當我們要同時儲存許多字串時，可能就要花點巧思了。 而這邊要介紹一個可以同時儲存多個字串的資料結構 ─ <em>字典樹</em> 或<em>Trie</em>。</p>
+</section><section id="trie-cont." class="slide level2">
+<h1>Trie (cont.)</h1>
+<p>Trie的道理非常簡單，其實就是用一棵樹來儲存字串。</p>
+<p>在這棵樹上，每個點上(除了根節點之外)都有一個字元，而從根節點一路走到某個節點，依序經過的字元串起來就是那個點代表的字串。</p>
+<p>最後我們再記錄哪些點是一個字串的最後一個字元即可！</p>
+</section><section id="section" class="slide level2">
+<h1></h1>
+<p>如下圖就是一個儲存<span class="math">\(\{A_1 = \texttt{abc}, A_2 =\texttt{abde}, A_3 = \texttt{bc}, A_4 = \texttt{bcd}\}\)</span>的trie</p>
+<figure>
+<img src="image/string-01.png" />
+</figure>
+</section><section id="section-1" class="slide level2">
+<h1></h1>
+<blockquote>
+<p>給定一個字典樹Trie   <span class="math">\(T = \{V, E\}\)</span>，我們定義<span class="math">\(P_T(v)\)</span>為從根節點走到<span class="math">\(v\)</span>所得出的字串。</p>
+</blockquote>
+<p>而Trie的基本操作也都很簡單，如要新增一個字串<span class="math">\(A\)</span>，我們就從根節點開始，依照字串<span class="math">\(A\)</span>的第<span class="math">\(0, 1, 2, \cdots, n-1\)</span>個字元， 如果此字元在當前節點的子節點中就繼續走下去，否則就新增一個節點。</p>
+</section><section id="字串匹配" class="slide level2">
+<h1>字串匹配</h1>
+<p>在處理字串問題時，會很常處理字串匹配問題。</p>
+<ul>
+<li class="fragment">請問這篇文章中出現多少次 <code>歐巴馬</code> ？</li>
+<li class="fragment">請問這段 DNA 序列中出現多少次 <code>AAA</code> ？</li>
+<li class="fragment">很常在文件使用的 <em>ctrl+f</em> 搜尋</li>
+</ul>
+</section><section id="section-2" class="slide level2">
+<h1></h1>
+<p>正式一點來說，字串匹配是個這樣的問題</p>
+<blockquote>
+<p>給你兩個字串 <span class="math">\(A\)</span>, <span class="math">\(B\)</span>，找出所有 <span class="math">\(B\)</span> 出現在 <span class="math">\(A\)</span> 中的位置。</p>
+</blockquote>
+</section><section id="簡單的做法" class="slide level2">
+<h1>簡單的做法</h1>
+<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">for</span> (<span class="dt">int</span> st = <span class="dv">0</span>; st + lenB &lt;= lenA; st++) {
+    <span class="dt">int</span> mat = <span class="dv">0</span>;
+    <span class="kw">while</span> (mat &lt; lenB &amp;&amp; A[st + mat] == B[mat]) mat++;
+    <span class="kw">if</span> (mat == lenB) output(st);
+}</code></pre>
+<p>這份 code 有兩的部分，一個是枚舉 <span class="math">\(B\)</span> 可能出現的位置，</p>
+<p>接著是一個 <code>while</code> 從這個位置判斷 <span class="math">\(B\)</span> 跟 <span class="math">\(A\)</span> 是否一樣。</p>
+<p>這邊也可以使用 <code>strcmp(A+st,B) == 0</code>。</p>
+</section><section id="section-3" class="slide level2">
+<h1></h1>
+<p>這樣寫好不好呢？</p>
+<p>其實可以證明這樣的 <em>期望複雜度</em> 是 <span class="math">\(O(|A|)\)</span>。</p>
+<p>可惜的是，最差的情況可以到<span class="math">\(O(|A||B|)\)</span>！</p>
+<p>更糟的是很容易構造出例子。</p>
+</section><section id="section-4" class="slide level2">
+<h1></h1>
+<p>如<span class="math">\(A = \texttt{AAAAA} \dots \texttt{AA}, B = \texttt{AAA} \dots \texttt{B}\)</span>，</p>
+<p>這樣雖然<span class="math">\(B\)</span>從來沒有出現在<span class="math">\(A\)</span>中，</p>
+<p>但是每個位置我們都必需匹配到 <span class="math">\(B\)</span> 的最後一個字元才能確定匹配失敗！</p>
+</section><section id="section-5" class="slide level2">
+<h1></h1>
+<p>說是這樣說，如果題目生測資太過於隨機的話，</p>
+<p>其實好好寫個樸素的解法很容易過 OAO，</p>
+<p>生測資很困難啊QA Q。</p>
+</section><section id="怎樣加速呢" class="slide level2">
+<h1>怎樣加速呢？</h1>
+<p>讓我們再看一次這份 code。</p>
+<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">for</span> (<span class="dt">int</span> st = <span class="dv">0</span>; st + lenB &lt;= lenA; st++) {
+    <span class="dt">int</span> mat = <span class="dv">0</span>;
+    <span class="kw">while</span> (mat &lt; lenB &amp;&amp; A[st + mat] == B[mat]) mat++;
+    <span class="kw">if</span> (mat == lenB) output(st);
+}</code></pre>
+<p>如果可以讓 <code>while</code> 的部分變成接近 <span class="math">\(O(1)\)</span>，</p>
+<p>我們就可以加速到 <span class="math">\(O(|A|)\)</span> 判斷兩個字串的長度。</p>
+</section></section>
+<section><section id="hashing" class="titleslide slide level1"><h1>Hashing</h1></section><section id="基本想法" class="slide level2">
+<h1>基本想法</h1>
+<p>想辦法幫一個字串算出它的「特徵」，</p>
+<p>就像你在找東西前會先觀察它的顏色、大小等等，利用這個快速判斷他在不在視線範圍之內， 說穿了就是定義一種分類方式。</p>
+<p><em>Hash</em> 就是個這樣的做法，利用分類加速你的搜尋速度。</p>
+</section><section id="hash-函數" class="slide level2">
+<h1>Hash 函數</h1>
+<ul>
+<li class="fragment">找到一個分類函數，即是一個<span class="math">\(f: \mathbb{S}(\Sigma) \mapsto \mathbb{Z}\)</span>，把所有可能的字串打到有界的整數，不妨說<span class="math">\(f(s) \in [0, M-1] \; \forall s\)</span>吧！</li>
+<li class="fragment">這個函數最好是均勻分部在<span class="math">\([0, M-1]\)</span>上。</li>
+<li class="fragment">計算這個函數最好不需花太多時間！</li>
+<li class="fragment"><blockquote>
+<p>一個滿足以上條件的函數我們就稱作「好的」 <em>Hash function</em></p>
+</blockquote></li>
+</ul>
+</section><section id="之後呢" class="slide level2">
+<h1>之後呢?</h1>
+<p>有了Hash function後有什麼用呢？</p>
+<p>雖然我們<em>無法保證</em><span class="math">\(A \neq B \; \Rightarrow f(A) \neq f(B)\)</span>，</p>
+<p>因為<span class="math">\(f\)</span>把有無窮多個元素的字串集合打到有限個整數上，</p>
+<p>當然會有許多字串被打到同一個整數！</p>
+</section><section id="section-6" class="slide level2">
+<h1></h1>
+<p>但至少我們會知道</p>
+<center>
+<span class="math">\(f(A) \neq f(B) \quad \Rightarrow \quad A \neq B\)</span>
+</center>
+<p>也就是說如果兩個字串的Hash value不一樣，那我們連匹配都不需要了，他們鐵定不相等！</p>
+<p>至於Hash function要怎麼找呢？</p>
+</section><section id="rabin-karp-rolling-hash-function" class="slide level2">
+<h1>Rabin-Karp rolling hash function</h1>
+<p>這是個常用的方法， 給定<span class="math">\(p, q\)</span> 跟長度為 <span class="math">\(n\)</span> 字串 <span class="math">\(A\)</span>，令</p>
+<p><span class="math">\(f(A) = a_0 p^{n-1} + a_1 p^{n-2} + \cdots + a_{n-2} p + a_{n-1} \mod{q}\)</span></p>
+<p><span class="math">\(=\sum_{0}^{n-1} a_i p^{n-i-1} \mod{q}\)</span></p>
+</section><section id="section-7" class="slide level2">
+<h1></h1>
+<p>看起來很複雜，其實就是字串<span class="math">\(A\)</span>在<span class="math">\(p\)</span>進位制代表的值模<span class="math">\(q\)</span>而已！</p>
+<ul>
+<li class="fragment"><p>那這個函數有符合我們的需求嗎？</p></li>
+<li class="fragment"><p>首先他把每個字串打到<span class="math">\([0, q-1]\)</span>，</p>
+<p>可以想成他把所有字串分成<span class="math">\(q\)</span>類。</p></li>
+<li class="fragment"><p>另外數學家跟我們說，如果<span class="math">\(p,q\)</span>取兩個不同的質數，通常結果會不錯，非常均勻！</p></li>
+</ul>
+</section><section id="sliding-window" class="slide level2">
+<h1>Sliding Window</h1>
+<p>另外計算這個函數只需要<span class="math">\(O(|A|)\)</span>，並且他還有一些很好的性質！</p>
+<ul>
+<li class="fragment"><p>遞迴性</p>
+<p><span class="math">\(f(A) \equiv f(A[0, n-2]) \times p + a_{n-1} \pmod{q}\)</span></p></li>
+<li class="fragment"><p>子字串的 hash value 與前綴的關係</p>
+<p><span class="math">\(f(A[i, j]) \equiv f(A[0, j]) - p^{j-i+1} f(A[0, i-1]) \pmod{q}\)</span></p></li>
+</ul>
+</section><section id="section-8" class="slide level2">
+<h1></h1>
+<p>所以對於一個字串 <span class="math">\(A\)</span>， 可以先利用<em>遞迴性</em>在 <span class="math">\(O(|A|)\)</span> 的時間內算出所有前綴的hash，<span class="math">\(f(P_A(i))\)</span>。</p>
+<p>對於任何一個子字串<span class="math">\(A[i,j]\)</span>，我們可以利用前綴預處理完的 hash 值 <span class="math">\(O(1)\)</span>算出結果。</p>
+</section><section id="section-9" class="slide level2">
+<h1></h1>
+<p>簡單的寫個 code，</p>
+<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="kw">typedef</span> <span class="dt">long</span> <span class="dt">long</span> LL;
+<span class="dt">char</span> a[N]; LL hsa[N];
+<span class="dt">int</span> p,q;
+LL mul(LL a, LL b, <span class="dt">int</span> mod){<span class="kw">return</span> a*b%mod;}
+LL add(LL a, LL b, <span class="dt">int</span> mod){<span class="kw">return</span> (a+b)%mod;}
+<span class="dt">void</span> init(string a){
+    pw[<span class="dv">0</span>] = <span class="dv">1</span>;
+    <span class="kw">for</span>(<span class="dt">int</span> i=<span class="dv">1</span>; i&lt;N; i++)
+        pw[i] = mul(pw[i<span class="dv">-1</span>], q);
+
+    <span class="kw">for</span>(<span class="dt">int</span> i=<span class="dv">0</span>; i&lt;(<span class="dt">int</span>)a.length(); i++)
+        hsa[i] = add((i==<span class="dv">0</span>?<span class="dv">0</span>:hsa[i<span class="dv">-1</span>])*p, (<span class="dt">int</span>)a[i]);
+}
+<span class="dt">int</span> hsf(<span class="dt">int</span> l,<span class="dt">int</span> r){
+    <span class="kw">return</span> hsa[r] - ((l==<span class="dv">0</span>)?<span class="dv">0</span>:mul(hsa[l<span class="dv">-1</span>], pw[r-l<span class="dv">+1</span>],q));
+}</code></pre>
+<p>這樣我們就有任意子字串的 hash value 可以用了。</p>
+</section><section id="section-10" class="slide level2">
+<h1></h1>
+<ul>
+<li class="fragment"><p>回到我們字串匹配的問題，我們只需要事先算出 <span class="math">\(A\)</span> 所有前綴的hash value和<span class="math">\(f(B)\)</span>，</p></li>
+<li class="fragment"><p>再枚舉<span class="math">\(A\)</span>所有長度為<span class="math">\(|B|\)</span>的子字串(差不多<span class="math">\(O(A)\)</span>個，</p></li>
+<li class="fragment"><p>最後計算這些子字串的 hash value 是不是等於<span class="math">\(f(B)\)</span>，總共只需要<span class="math">\(O(N)\)</span>。</p></li>
+</ul>
+</section><section id="會不會壞掉呢" class="slide level2">
+<h1>會不會壞掉呢？</h1>
+<p>等等！回想我們剛剛說的：我們知道<span class="math">\(f(A) \neq f(B) \Rightarrow A \neq B\)</span>，</p>
+<p>但卻無法保證<span class="math">\(f(A) = f(B) \Rightarrow A = B\)</span>啊？</p>
+<ul>
+<li class="fragment"><p>有人可能會想說：「相等時重新檢查一次」，</p></li>
+<li class="fragment"><p>但如果<span class="math">\(A = \texttt{AAA} \dots \texttt{AAA}, B = \texttt{AA} \dots \texttt{AA}\)</span>，就又會又退化成<span class="math">\(O(|A||B|)\)</span>了！</p>
+<p>那怎麼辦呢？</p></li>
+<li class="fragment"><p>答案是：把<span class="math">\(q\)</span>取大一點，然後就相信 <span class="math">\(f(A) = f(B)\)</span>的機率很小，不會發生！</p></li>
+</ul>
+</section><section id="section-11" class="slide level2">
+<h1></h1>
+<p>事實上如果<span class="math">\(f\)</span>是均勻的，那<span class="math">\(f(A) = k\)</span>的機率差不多是<span class="math">\(1/q\)</span>！</p>
+<p>只要<span class="math">\(q\)</span>取夠大，比如一個 <code>long long</code> 的質數，差不多<span class="math">\(10^{15}\)</span>，那麼兩個不同的字串<em>碰撞</em>的機率是<span class="math">\(10^{-15}\)</span>，</p>
+<p>是一個人被閃電打到兩次的機率(一次機率差不多是<span class="math">\(8 \times 10^{-7}\)</span>)，不太可能啦！</p>
+</section><section id="如果碰撞了" class="slide level2">
+<h1>如果碰撞了？</h1>
+<ul>
+<li class="fragment"><p>有些常用的質數有人會故意構造會碰撞的測資</p>
+<p>像是大家很愛用的 <span class="math">\(10^9+7\)</span> 或是 <span class="math">\(10^9+9\)</span>，</p></li>
+<li class="fragment"><p>或是真的很衰就是被雷打到了，不管怎樣反正就是你因為碰撞WA了。</p>
+<p>要怎辦呢？</p></li>
+</ul>
+</section><section id="section-12" class="slide level2">
+<h1></h1>
+<figure>
+<img src="image/lightening_safety.jpg" />
+</figure>
+</section><section id="section-13" class="slide level2">
+<h1></h1>
+<p>這時候可以嘗試使用兩組不同的 <span class="math">\((p_1, q_1), (p_2, q_2)\)</span> 湊出的兩個hash function <span class="math">\(f_1(x), f_2(x)\)</span>， 並使用數對 <span class="math">\((H_1 = f_1(S),H_2 = f_2(S))\)</span> 當作你的hash value，</p>
+<p>也就是</p>
+<p><span class="math">\(f_1(A) \neq f_1(B) \quad or \quad f_2(A) \neq f_2(B) \Rightarrow A \neq B\)</span></p>
+<p>這樣碰撞的機率就會大大減少，再WA...你有其他bug機率可能還比較高(?)。</p>
+</section></section>
+<section><section id="kmp" class="titleslide slide level1"><h1>KMP</h1></section><section id="想法" class="slide level2">
+<h1>想法</h1>
+<p>當我們在做最普通的匹配時...</p>
+<figure>
+<img src="image/string-05.png" />
+</figure>
+</section><section id="定義" class="slide level2">
+<h1>定義</h1>
+<p>對於一個字串<span class="math">\(B = b_0 b_1 \cdots b_{m-1}\)</span>，我們定義</p>
+<ul>
+<li class="fragment"><p><span class="math">\(F_B(i) = \max \{ k: P_B(k) = B[0, k] = B[i-k, i] \}\)</span></p>
+<p><span class="math">\(\quad\quad\quad \quad \text{if } i \neq 0 \text{ and at least a $k$ exists}\)</span></p></li>
+<li class="fragment"><p><span class="math">\(\quad \quad= -1\)</span>, else</p></li>
+<li class="fragment"><p><span class="math">\(F(i)+1\)</span>也稱作在第<span class="math">\(i\)</span>個位置的<em>共同前後綴</em>長度</p></li>
+</ul>
+</section><section id="例子-1" class="slide level2">
+<h1>例子</h1>
+<p>舉個長一點的例子，如果<span class="math">\(S = \texttt{ababaabababaababa}\)</span>， 那麼<span class="math">\(F_{S}(j)\)</span>會是：</p>
+<figure>
+<img src="image/string-06.png" />
+</figure>
+</section><section id="section-14" class="slide level2">
+<h1></h1>
+<p>由上面的推論,我們總結 <span class="math">\(F(j)\)</span> 的一個非常重要的性質:</p>
+<p><span class="math">\(F_B(j)\)</span> 告訴我們在拿 <span class="math">\(B\)</span> 去 匹配 <span class="math">\(A\)</span> 的過程中，如果 <span class="math">\(B[0, j]\)</span> 已經匹配成功，</p>
+<p>但在第 <span class="math">\(j + 1\)</span> 個位置匹配失敗了， 應該要把 <span class="math">\(B\)</span> 的第 <span class="math">\(F(j)\)</span> 個字元對齊原本 <span class="math">\(B[j]\)</span> 的位置繼續匹配!</p>
+<p>再舉個例子,容易 知道如果 <span class="math">\(B = \texttt{aabaabd}\)</span>,則 <span class="math">\(F(j) = \{−1, 0, −1, 0, 1, 2, −1\}\)</span>。</p>
+</section><section id="section-15" class="slide level2">
+<h1></h1>
+<p>假設我們已經匹配 <span class="math">\(B[0, 4]\)</span>，但在第 5 個字元出問題了，</p>
+<pre><code>    01234567
+A = aabaaa?????
+    |||||*        Matching failed at position 5
+B = aabaabd         
+       ||*        F(4) = 1, Matching failed at position 2
+       aabaabd
+        |*        F(1) = 0
+        aabaabd</code></pre>
+<ul>
+<li class="fragment">這樣我們一次可能往前一大步，而不用每次位移一格重新匹配了!</li>
+<li class="fragment">F 可以說是個快速重新對齊的的function ！</li>
+</ul>
+</section><section id="怎樣計算-f-呢" class="slide level2">
+<h1>怎樣計算 F 呢？</h1>
+<p>假設我們已經求出了 <span class="math">\(F(i),\forall 0 \le i \le n\)</span>，現在要求 <span class="math">\(F(n + 1)\)</span>，</p>
+<ul>
+<li class="fragment"><p>根據定義相當於要求最大的 <span class="math">\(k = k′ + 1\)</span> 使 <span class="math">\(B[0,k] = B[n+1−k,n+1]\)</span>。</p></li>
+<li class="fragment"><p>而<span class="math">\(B[0,k] = B[n+1−k,n+1]\)</span></p>
+<p><span class="math">\(\Leftrightarrow B[0,k′] = B[n−k′,n]∧B[k′ +1] = B[n+1]\)</span></p></li>
+</ul>
+</section><section id="section-16" class="slide level2">
+<h1></h1>
+<p>由失敗函數的定義我們知道 <span class="math">\(k′\)</span> 最大只能是 <span class="math">\(F(n)\)</span>，如果此時 <span class="math">\(B[F(n) + 1] = B[n + 1]\)</span>， 我們立刻便知道 <span class="math">\(F(n + 1) = F(n) + 1\)</span>。</p>
+<p>但如果不是怎麼辦? 難道必需 <span class="math">\(k′ = F(n) − 1,F(n) − 2··· ,0\)</span> 一直試下去嗎?不要忘記我們已經算出所有 <span class="math">\(j \le n\)</span> 的 <span class="math">\(F(j)\)</span> 了,</p>
+</section><section id="section-17" class="slide level2">
+<h1></h1>
+<p>我們便把當前位置 <span class="math">\(n\)</span> 對齊 B[F(F(n))]。</p>
+<p>也就是下一個要試的 k′ 是 <span class="math">\(F(F(n))\)</span>！</p>
+<p>如果又失敗,我們便再試 <span class="math">\(F^{3}(n),F^4(n), \cdots\)</span>，</p>
+<p>直到終於成功或是確認沒有 <span class="math">\(k\)</span> 存在 (<span class="math">\(F(n + 1) = −1\)</span>)。</p>
+</section><section id="計算-f-的-code" class="slide level2">
+<h1>計算 F 的 code</h1>
+<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> build_fail_function(string B, <span class="dt">int</span> *fail) {
+    <span class="dt">int</span> len = B.length(), current_pos;
+    current_pos = fail[<span class="dv">0</span>] = <span class="dv">-1</span>; <span class="co">//Specially fail[0] = -1</span>
+    <span class="kw">for</span>( <span class="dt">int</span> i = <span class="dv">1</span> ; i &lt; len ; i ++ ) {
+        <span class="kw">while</span>( current_pos != <span class="dv">-1</span>
+               &amp;&amp; B[current_pos + <span class="dv">1</span>] != B[i] ) {
+            current_pos = fail[current_pos];
+        }
+        <span class="kw">if</span>( B[ current_pos + <span class="dv">1</span> ] == B[i] ) current_pos ++;
+        fail[i] = current_pos;
+    }
+}</code></pre>
+</section><section id="匹配的-code" class="slide level2">
+<h1>匹配的 code</h1>
+<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">void</span> match(string A, string B, <span class="dt">int</span> *fail) {
+    <span class="dt">int</span> lenA = A.length(), lenB = B.length();
+    <span class="dt">int</span> current_pos = <span class="dv">-1</span>;
+    <span class="kw">for</span>( <span class="dt">int</span> i = <span class="dv">0</span> ; i &lt; lenA ; i ++ ) {
+        <span class="kw">while</span>( current_pos != <span class="dv">-1</span> 
+               &amp;&amp; B[current_pos + <span class="dv">1</span>] != A[i] ) {
+            current_pos = fail[current_pos];
+        }
+        <span class="kw">if</span>( B[current_pos + <span class="dv">1</span>] == A[i] ) current_pos ++;
+        <span class="kw">if</span>( current_pos == lenB - <span class="dv">1</span> ) {
+            <span class="co">// Match !</span>
+            <span class="co">// A[i - lenB + 1, i] = B</span>
+            current_pos = fail[current_pos];
+        }
+    }
+}</code></pre>
+</section><section id="section-18" class="slide level2">
+<h1></h1>
+<p><span class="math">\(B[0, F(i)]\)</span>是<span class="math">\(B\)</span>最長的一個前綴使得<span class="math">\(B[0, F(i)] = B[i - F(i), i]\)</span>，但 <span class="math">\(F(i) \neq i\)</span></p>
+<p>令<span class="math">\(F^k(i) = \overbrace{f \circ f \circ \cdots \circ f}^{k} (i)\)</span>，則：</p>
+<p><span class="math">\(\exists n, \; F^n(i) = -1\)</span></p>
+<p><span class="math">\(F^{k+1}(i) &lt; F^{k}(i) \quad \text{if} \quad F^k(i) \neq -1\)</span></p>
+<p>令<span class="math">\(K = \{ i, F(i), F^2(i) , \cdots , F^{n-1}(i), F^n(i) = -1\}\)</span>，</p>
+<p>則 <span class="math">\(B[0, k] = B[i-k, i] \; \Leftrightarrow \; k \in K\)</span></p>
+<p><span class="math">\(-1 \leq F(i+1) \leq F(i) + 1\)</span></p>
+</section><section id="section-19" class="slide level2">
+<h1></h1>
+<p>最後我們分析一下KMP的時間複雜度，參考範例程式碼， 可以發現不管在計算 <span class="math">\(F\)</span> 或是在匹配，對於每一次的匹配，</p>
+<p>當前<span class="math">\(B\)</span>的匹配位置(current_pos)會</p>
+<ul>
+<li class="fragment">(a).被疊代入 <span class="math">\(F\)</span> 若干次。</li>
+<li class="fragment"><p>(b).如果匹配成功，便加<span class="math">\(1\)</span>。</p></li>
+<li class="fragment"><p>但我們知道每次疊代current_pos至少會減<span class="math">\(1\)</span>，並且疊代到<span class="math">\(-1\)</span>時便會停止，</p>
+<p>因此(a)中疊代的次數不會超過(b)被執行的次數！</p></li>
+<li class="fragment"><p>而(b)又不會超過字串的長度，</p>
+<p>所以KMP的時間複雜度是<span class="math">\(O(|A| + |B|)\)</span>，線性！</p></li>
+</ul>
+</section></section>
+<section><section id="z-value" class="titleslide slide level1"><h1>Z-value</h1></section><section id="z-value-1" class="slide level2">
+<h1>Z-value</h1>
+<p>在計算一個答案時，如果能妥善利用已知的資訊，便可以加速計算所需的時間。</p>
+<p>而Z Algorithm ( Z-value ) 便是充分的利用這一點。</p>
+<p>現在我們就來介紹這個名字很帥氣的演算法。</p>
+</section><section id="算法內容" class="slide level2">
+<h1>算法內容</h1>
+<p>Z function 的核心概念在建出一個 <span class="math">\(Z\)</span> 陣列， <span class="math">\(Z[i]\)</span> 代表從第 <span class="math">\(i\)</span> 個字元開始所形成的後綴與原字串的共同最長前綴有多長， 唯一的例外是 <span class="math">\(Z[0]\)</span> 通常強制被設成 <span class="math">\(0\)</span> 。</p>
+<p>首先我們定義Z function</p>
+<p>對於一個字串<span class="math">\(A = a_0 a_1 \cdots a_{n-1}\)</span>，定義</p>
+<blockquote>
+<p><span class="math">\(Z_A(i) = 0, \quad \text{if } i = 0 \text{ or } A[i] \neq A[0]\)</span></p>
+<p><span class="math">\(\max \{ k : A[0, k-1] = A[i, i+k-1] \},\text{else}\)</span></p>
+</blockquote>
+</section><section id="section-20" class="slide level2">
+<h1></h1>
+<p>看起來和失敗函數<span class="math">\(F(i)\)</span>有點像，</p>
+<p>但不一樣的是<span class="math">\(Z(i)\)</span>表示<span class="math">\(A\)</span>的後綴<span class="math">\(S_A(i)\)</span>，</p>
+<p>也就是從<span class="math">\(A[i]\)</span>開始的字串，可以和<span class="math">\(A\)</span>自已匹配多長。</p>
+</section><section id="看個例子" class="slide level2">
+<h1>看個例子</h1>
+<p>舉例而言，對於字串<span class="math">\(S = \texttt{&quot;ababaabababaababa&quot;}\)</span>來說，Z function的值為：</p>
+<figure>
+<img src="image/string-02.png" />
+</figure>
+</section><section id="section-21" class="slide level2">
+<h1></h1>
+<p>現在我們需要一個快速求出所有 <span class="math">\(Z(i)\)</span> 的方法，假設我們已經知道了 <span class="math">\(Z(i) = z\)</span>， 也就是 <span class="math">\(A[0, z-1] = A[i, i+z-1]\)</span>。</p>
+<p>那麼 <span class="math">\(Z(i+1), Z(i+2), \cdots , Z(i+z-1)\)</span> 是否會和 <span class="math">\(Z(1), Z(2), \cdots, Z(z-1)\)</span> 有關係呢？</p>
+</section><section id="section-22" class="slide level2">
+<h1></h1>
+<p>事實上Z function有一個很重要的性質是 對於一個字串<span class="math">\(A = a_0 a_1 \cdots a_{n-1}\)</span>，如果<span class="math">\(Z(i) = z\)</span>，則</p>
+<ul>
+<li class="fragment"><p><span class="math">\(A[k] = A[i+k], \quad \text{if } \; 0 \leq k &lt; z\)</span>.</p></li>
+<li class="fragment"><p><span class="math">\(A[z] \neq A[i+z]\)</span>. </p></li>
+<li class="fragment">令<span class="math">\(L = i, R = i + z - 1\)</span>，現在假設<span class="math">\(L \leq j \leq R, j&#39; = j - L\)</span>，則：
+<ul>
+<li class="fragment">如果 <span class="math">\(j&#39; + Z(j&#39;) &lt; z\)</span>，則 <span class="math">\(Z(j) = Z(j&#39;)\)</span></li>
+<li class="fragment">如果 <span class="math">\(j&#39; + Z(j&#39;) &gt; z\)</span>， 則 <span class="math">\(Z(j) = R - j + 1\)</span></li>
+<li class="fragment">如果 <span class="math">\(j&#39; + Z(j&#39;) = z\)</span>， 則 <span class="math">\(Z(j) \geq R - j + 1 = Z(j&#39;)\)</span></li>
+</ul></li>
+</ul>
+</section><section id="case-1" class="slide level2">
+<h1>Case 1</h1>
+<p>如果 <span class="math">\(j&#39; + Z(j&#39;) &lt; z\)</span>，則 <span class="math">\(Z(j) = Z(j&#39;)\)</span></p>
+<figure>
+<img src="image/string-03.png" />
+</figure>
+</section><section id="case-2" class="slide level2">
+<h1>Case 2</h1>
+<p>如果 <span class="math">\(j&#39; + Z(j&#39;) &gt; z\)</span>， 則 <span class="math">\(Z(j) = R - j + 1\)</span></p>
+<figure>
+<img src="image/string-04.png" />
+</figure>
+</section><section id="case-3" class="slide level2">
+<h1>Case 3</h1>
+<p>如果 <span class="math">\(j&#39; + Z(j&#39;) = z\)</span>， 則 <span class="math">\(Z(j) \geq R - j + 1 = Z(j&#39;)\)</span></p>
+<p>最後一種情況雖然我們無法直接得出 <span class="math">\(Z(j)\)</span>，但我們至少會知道<span class="math">\(Z(j) ≥ Z(j′)\)</span>，</p>
+<p>因此我們繼續從 R 下去匹配就可以了!</p>
+</section><section id="讓我們來看看-code" class="slide level2">
+<h1>讓我們來看看 code</h1>
+<pre class="sourceCode cpp"><code class="sourceCode cpp"><span class="dt">char</span> A[MXN]; <span class="dt">int</span> Z[MXN];
+Z[<span class="dv">0</span>] = <span class="dv">0</span>;
+<span class="dt">int</span> L = <span class="dv">0</span>, R = <span class="dv">0</span>;
+<span class="kw">for</span> ( <span class="dt">int</span> i = <span class="dv">1</span> ; i &lt; len ; i ++ ) {
+    <span class="kw">if</span> ( i &gt; R ) Z[i] = <span class="dv">0</span>;
+    <span class="kw">else</span> {
+        <span class="dt">int</span> ip = i - L;
+        <span class="kw">if</span> ( ip + Z[ip] &lt; Z[L] ) Z[i] = Z[ip]; <span class="co">// Case 1</span>
+        <span class="kw">else</span> Z[i] = R - i + <span class="dv">1</span>; <span class="co">// Case 2, 3</span>
+    }
+    <span class="kw">while</span> ( i + Z[i] &lt; len &amp;&amp; A[ i + Z[i] ] == A[ Z[i] ] ) Z[i] ++;
+    <span class="kw">if</span> ( i + Z[i] - <span class="dv">1</span> &gt; R ) {
+        L = i;
+        R = i + Z[i] - <span class="dv">1</span>;
+    }
+}</code></pre>
+</section><section id="section-23" class="slide level2">
+<h1></h1>
+<p>不過這和字串匹配有什麼關係呢？ 假設我們要拿 <span class="math">\(B\)</span> 匹配 <span class="math">\(A\)</span> ， 只要令 <span class="math">\(C = B \phi A\)</span>，其中 <span class="math">\(\phi\)</span> 是從來沒有在 <span class="math">\(A, B\)</span> 間出現過的字元，</p>
+<p>這樣如果 <span class="math">\(A[i, i+k-1] = B, \: k = |B|\)</span> ，必有 <span class="math">\(C[k+i+1, 2k+i] = C[0, k-1]\)</span> ， 也就是 <span class="math">\(Z_C(k+i+1) = k\)</span>。</p>
+</section></section>
+<section><section id="那些-kmp-z-value-教我的事" class="titleslide slide level1"><h1>那些 kmp z-value 教我的事</h1></section><section id="來想些題目吧" class="slide level2">
+<h1>來想些題目吧，</h1>
+<blockquote>
+<p>給你一個字串 <span class="math">\(S\)</span>, 要你找出一個最短的字串 <span class="math">\(K\)</span>, 使得 <span class="math">\(K\)</span> 重複若干次接在一起後會變成 <span class="math">\(S\)</span>. 輸出 matching 到的長度。</p>
+</blockquote>
+</section><section id="section-24" class="slide level2">
+<h1></h1>
+<p>這題有兩派作法， KMP 或 Z-value 皆可。</p>
+<ul>
+<li class="fragment"><p>以 Z-value 而言</p>
+<p>做完 <span class="math">\(Z\)</span> 之後我們只要看看那些 <span class="math">\(|S|\)</span> 因數位置的 <span class="math">\(Z\)</span> 值就知道答案了。</p></li>
+<li class="fragment"><p>以 KMP 而言</p>
+<p>我們只要做完 predo 其實就知道答案了。令 <span class="math">\(K = |S| - dp[|S|-1]\)</span> ， 如果 <span class="math">\(K\)</span> 是 <span class="math">\(|S|\)</span> 的因數，那麼 <span class="math">\(S[0\,..\,K-1]\)</span> 就是答案，若否則 <span class="math">\(S\)</span> 自己就是答案。</p></li>
+</ul>
+</section><section id="kmp-1" class="slide level2">
+<h1>KMP</h1>
+<pre><code>ABABABAB
+P----P..
+..S----S
+
+ans: 2
+
+AAABAA
+PP....
+....SS
+
+ans: -1</code></pre>
+</section><section id="其他方法" class="slide level2">
+<h1>其他方法</h1>
+<p>其實這題如果使用 hash 可以做到很快，先找出所有 <span class="math">\(n\)</span> 的因數， 從小到大每個因數 <span class="math">\(d\)</span>，判斷所以 <span class="math">\(hash(A[i \times d,(i+1 \times d -1)])\)</span> 是否相同， 如果是就輸出答案， 這樣可以做到 <span class="math">\({\Sigma}_{d|n} d\)</span>， 數量量級是 <span class="math">\(O(n)\)</span> 的。</p>
+</section><section id="來想些題目吧-cont." class="slide level2">
+<h1>來想些題目吧 (cont.)</h1>
+<blockquote>
+<p>給你一個字串 <span class="math">\(S\)</span>, 求一個最短的字串 <span class="math">\(T\)</span>, 使得你可以用若干個 <span class="math">\(T\)</span> 疊成 <span class="math">\(S\)</span>. (重疊之處必須相同) 給個提示，我能用 Z-value 作到 <span class="math">\(O(n)\)</span>，而用 KMP 作到 <span class="math">\(O(n)\)</span> 。</p>
+</blockquote>
+</section></section>
+<section><section id="ac-自動機" class="titleslide slide level1"><h1>AC 自動機</h1></section><section id="what-this-is" class="slide level2">
+<h1>What this is?</h1>
+<ul>
+<li class="fragment"><p>就是...傳上去你就會AC了(?)</p></li>
+<li class="fragment"><p>不...那是自動 AC 機。</p></li>
+<li class="fragment"><p>我第一次看到覺得名字很帥就是了。</p>
+<p>他的全名是 Aho-Corasick Algorithm</p></li>
+</ul>
+</section><section id="內容簡介" class="slide level2">
+<h1>內容簡介</h1>
+<p>可以說是 KMP 的強化板。</p>
+<p>如果今天我們要在字串<span class="math">\(A\)</span>上搜尋很多字串 <span class="math">\(B_1, B_2, \cdots B_n\)</span>要怎麼做？</p>
+<ul>
+<li class="fragment"><p>當然我們可以做 <span class="math">\(n\)</span> 次KMP得到一個<span class="math">\(O(n|A| + \sum|B| )\)</span>的方法，</p></li>
+<li class="fragment"><p>但信不信由你，其實我們可以在 <span class="math">\(O(|A| + \sum |B| )\)</span> 的時間完成</p></li>
+</ul>
+</section><section id="做法簡介" class="slide level2">
+<h1>做法簡介</h1>
+<ul>
+<li class="fragment"><p>先用 <span class="math">\(B_1, B_2, \cdots B_n\)</span> 建出一顆 trie</p></li>
+<li class="fragment"><p>對於 trie上的每個節點 <span class="math">\(v\)</span>，建一個類似kmp 的 failure function 的 <em>failure link</em>，</p>
+<p><span class="math">\(f(v)\)</span> 是指到樹上的另外一個點，</p>
+<p>並且把所有 <span class="math">\(B_i\)</span> 的節點標記起來。</p></li>
+</ul>
+</section><section id="section-25" class="slide level2">
+<h1></h1>
+<p>用<code>a</code>, <code>c</code>, <code>ab</code>, <code>cc</code>,<code>cca</code>, <code>bab</code>, <code>caa</code> 建出的 AC 自動機，藍線是 failure link。</p>
+<figure>
+<img src="image/string-07.png" />
+</figure>
+</section><section id="section-26" class="slide level2">
+<h1></h1>
+<ul>
+<li class="fragment"><p>要尋找 <span class="math">\(B_i\)</span> 在 <span class="math">\(A\)</span> 上匹配的時候每次就會在 trie 上走，每次 <span class="math">\(A[i]\)</span> 會嘗試匹配，</p>
+<p>如果失敗就會往回走到 <span class="math">\(f(v)\)</span> 繼續嘗試匹配，</p>
+<p>如果走到標記的點就幫 <span class="math">\(B_i\)</span> 的 count++</p></li>
+</ul>
+</section><section id="看看-code" class="slide level2">
+<h1>看看 code ?</h1>
+<pre class="sourceCode cpp"><code class="sourceCode cpp">root-&gt;fail = NULL;
+queue&lt;Node*&gt; que;
+que.push_back(root);
+<span class="kw">while</span> ( !que.empty() ) {
+    Node *fa = que.front(); que.pop_front();
+    <span class="kw">for</span> (<span class="kw">auto</span> it = fa-&gt;child.begin(); it != fa-&gt;child.end(); it++) {
+        Node *cur = it-&gt;second, *ptr = fa-&gt;fail;
+        <span class="kw">while</span> ( ptr &amp;&amp; !ptr-&gt;child.count(it-&gt;first) ) ptr = ptr-&gt;fail;
+        cur-&gt;fail = ptr ? ptr-&gt;child[it-&gt;first] : root;
+        que.push(cur);
+    }
+}</code></pre>
+</section><section id="section-27" class="slide level2">
+<h1></h1>
+<p>演算法其他詳細內容或用法， 請見進階字串的章節。</p>
+</section></section>
+    </div>
+  </div>
+
+
+  <script src="reveal.js/lib/js/head.min.js"></script>
+  <script src="reveal.js/js/reveal.min.js"></script>
+
+  <script>
+
+      // Full list of configuration options available here:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        theme: 'black', // available themes are in /css/theme
+        transition: 'slide', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+//          { src: 'reveal.js/plugin/search/search.js', async: true, condition: function() { return !!document.body.classList; }, }
+//          { src: 'reveal.js/plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+]});
+    </script>
+    </body>
+</html>
